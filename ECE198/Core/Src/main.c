@@ -98,14 +98,86 @@ int main(void)
   while (1)
   {
     /* USER CODE END WHILE */
-	  if (HAL_GPIO_ReadPin(GPIOB, GPIO_PIN_8)){
-		  HAL_GPIO_WritePin(GPIOB, GPIO_PIN_9, GPIO_PIN_SET);
-	  }
-	  else if (HAL_GPIO_ReadPin(GPIOB, GPIO_PIN_6)){
-		  HAL_GPIO_WritePin(GPIOB, GPIO_PIN_9, GPIO_PIN_RESET);
-	  }
-    /* USER CODE BEGIN 3 */
+
+    // Variables for pins (change later)
+    GPIO_TypeDef* led_port = GPIOB;
+    GPIO_TypeDef* button_port = GPIOB;
+    GPIO_TypeDef* speaker_port = GPIOB;
+    uint16_t led_pin_1 = GPIO_PIN_9;
+    uint16_t led_pin_2 = GPIO_PIN_10;
+    uint16_t led_pin_3 = GPIO_PIN_11;
+    uint16_t speaker_pin = GPIO_PIN_8;
+    uint16_t button_pin_on = GPIO_PIN_12;
+    uint16_t button_pin_reset = GPIO_PIN_15;
+    uint16_t button_pin_light = GPIO_PIN_13;
+    uint16_t button_pin_sound = GPIO_PIN_14;
+
+    // If ON button is pressed
+    if(HAL_GPIO_ReadPin(button_port, button_pin_on)){
+        // Initialize variables for light and sound settings
+        int set_light = 1;  // 0 - default, 1 - medium, 2 - high
+        int set_sound = 1;
+        // Check if off button is pressed
+        int is_on = 1;
+        // Keep running while OFF is not pressed
+        while(is_on){
+            // Variables for light and sound settings
+
+            // If RESET button is pressed
+            if(HAL_GPIO_ReadPin(button_port, button_pin_reset)){
+                set_light = 1;
+                set_sound = 1;
+            }
+            // If SOUND button is pressed
+            else if(HAL_GPIO_ReadPin(button_port, button_pin_sound)){
+                if(set_sound > 0 && set_sound < 2){
+                    set_sound++;
+                }else{
+                    set_sound = 0;
+                }
+            }
+            // If LIGHT button is pressed
+            else if(HAL_GPIO_ReadPin(button_port, button_pin_light)){
+                if(set_light > 0 && set_light < 2){
+                    set_light++;
+                }else{
+                    set_light = 0;
+                }
+            }
+            // If OFF button is pressed
+            else if(HAL_GPIO_ReadPin(button_port, button_pin_on)){
+                is_on = 0;
+            }
+
+            // Output for light and sound settings
+
+            // Turn on one LED and ensure other two LEDs are off
+            if(set_light == 0){
+                HAL_GPIO_WritePin(led_port, led_pin_1, GPIO_PIN_SET);
+                HAL_GPIO_WritePin(led_port, led_pin_2, GPIO_PIN_RESET);
+                HAL_GPIO_WritePin(led_port, led_pin_3, GPIO_PIN_RESET);
+                HAL_GPIO_WritePin(speaker_port, speaker_pin, GPIO_PIN_SET);
+            }
+            // Turn on two LEDs and ensure last LED is off
+            else if(set_light == 1){
+                HAL_GPIO_WritePin(led_port, led_pin_1, GPIO_PIN_SET);
+                HAL_GPIO_WritePin(led_port, led_pin_2, GPIO_PIN_SET);
+                HAL_GPIO_WritePin(led_port, led_pin_3, GPIO_PIN_RESET);
+                HAL_GPIO_WritePin(speaker_port, speaker_pin, GPIO_PIN_SET);
+            }
+            // Turn on three LEDs
+            else if(set_light == 2){
+                HAL_GPIO_WritePin(led_port, led_pin_1, GPIO_PIN_SET);
+                HAL_GPIO_WritePin(led_port, led_pin_2, GPIO_PIN_SET);
+                HAL_GPIO_WritePin(led_port, led_pin_3, GPIO_PIN_SET);
+                HAL_GPIO_WritePin(speaker_port, speaker_pin, GPIO_PIN_SET);
+            }
+
+            HAL_Delay(200);  // Delay to debounce button presses
+        }
+    }
   }
+
   /* USER CODE END 3 */
 }
 
