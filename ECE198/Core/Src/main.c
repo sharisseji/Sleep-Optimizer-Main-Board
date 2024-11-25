@@ -56,7 +56,7 @@ static void MX_USART2_UART_Init(void);
 
 /* Private user code ---------------------------------------------------------*/
 /* USER CODE BEGIN 0 */
-
+uint8_t receivedData[1];
 /* USER CODE END 0 */
 
 /**
@@ -101,11 +101,10 @@ int main(void)
 
 	  uint8_t button_state = GPIO_PIN_SET;  // To store the previous state of the button
 
-	 	  while (1) {
-	 		  //WORKING CODE
-	 	      uint8_t current_button_state = HAL_GPIO_ReadPin(GPIOC, GPIO_PIN_13);
+	 //WORKING CODE
+	  uint8_t current_button_state = HAL_GPIO_ReadPin(GPIOC, GPIO_PIN_13);
 
-	 	      // Check for rising edge (button pressed)
+	 // Check for rising edge (button pressed)
 	 	      if (current_button_state == GPIO_PIN_RESET && button_state == GPIO_PIN_SET) {
 	 	          HAL_GPIO_TogglePin(GPIOA, GPIO_PIN_9);
 	 	          HAL_GPIO_TogglePin(GPIOA, GPIO_PIN_7);
@@ -128,7 +127,7 @@ int main(void)
 	 			  HAL_GPIO_WritePin(GPIOA, GPIO_PIN_8,GPIO_PIN_RESET);
 	 			  HAL_GPIO_WritePin(GPIOA, GPIO_PIN_6,GPIO_PIN_RESET);
 	 		  }
-	 	  }
+
 
 
     /* USER CODE END WHILE */
