@@ -40,7 +40,6 @@
 /* USER CODE END PM */
 
 /* Private variables ---------------------------------------------------------*/
-UART_HandleTypeDef huart2;
 
 /* USER CODE BEGIN PV */
 
@@ -49,7 +48,6 @@ UART_HandleTypeDef huart2;
 /* Private function prototypes -----------------------------------------------*/
 void SystemClock_Config(void);
 static void MX_GPIO_Init(void);
-static void MX_USART2_UART_Init(void);
 /* USER CODE BEGIN PFP */
 
 /* USER CODE END PFP */
@@ -88,7 +86,6 @@ int main(void)
 
   /* Initialize all configured peripherals */
   MX_GPIO_Init();
-  MX_USART2_UART_Init();
   /* USER CODE BEGIN 2 */
 
   /* USER CODE END 2 */
@@ -97,43 +94,38 @@ int main(void)
   /* USER CODE BEGIN WHILE */
   while (1)
   {
-
-
 	  uint8_t button_state = GPIO_PIN_SET;  // To store the previous state of the button
 
 	 //WORKING CODE
 	  uint8_t current_button_state = HAL_GPIO_ReadPin(GPIOC, GPIO_PIN_13);
-
-	 // Check for rising edge (button pressed)
-	 	      if (current_button_state == GPIO_PIN_RESET && button_state == GPIO_PIN_SET) {
-	 	          HAL_GPIO_TogglePin(GPIOA, GPIO_PIN_9);
-	 	          HAL_GPIO_TogglePin(GPIOA, GPIO_PIN_7);
-	 	          HAL_GPIO_TogglePin(GPIOA, GPIO_PIN_8);
-	 	          HAL_GPIO_TogglePin(GPIOA, GPIO_PIN_6);
-	 	      }
-
-	 	      // Update the button state
-	 	      button_state = current_button_state;
-	 		  HAL_UART_Receive(&huart2,receivedData,1,100);
-	 		  if(receivedData[0]=='0'){
-	 			  HAL_GPIO_WritePin(GPIOA,GPIO_PIN_9, GPIO_PIN_SET);
-	 			  HAL_GPIO_WritePin(GPIOA,GPIO_PIN_7,GPIO_PIN_SET);
-	 			  HAL_GPIO_WritePin(GPIOA, GPIO_PIN_8,GPIO_PIN_SET);
-	 			  HAL_GPIO_WritePin(GPIOA, GPIO_PIN_6,GPIO_PIN_SET);
-	 		  }
-	 		  else if (receivedData[1]=='1'){
-	 			  HAL_GPIO_WritePin(GPIOA,GPIO_PIN_9,GPIO_PIN_RESET);
-	 			  HAL_GPIO_WritePin(GPIOA,GPIO_PIN_7,GPIO_PIN_RESET);
-	 			  HAL_GPIO_WritePin(GPIOA, GPIO_PIN_8,GPIO_PIN_RESET);
-	 			  HAL_GPIO_WritePin(GPIOA, GPIO_PIN_6,GPIO_PIN_RESET);
-	 		  }
-
-
+    // Check for rising edge (button pressed)
+    if (current_button_state == GPIO_PIN_RESET && button_state == GPIO_PIN_SET) {
+      HAL_GPIO_TogglePin(GPIOA, GPIO_PIN_9);
+      HAL_GPIO_TogglePin(GPIOA, GPIO_PIN_7);
+      HAL_GPIO_TogglePin(GPIOA, GPIO_PIN_8);
+      HAL_GPIO_TogglePin(GPIOA, GPIO_PIN_6);
+    }
+    // Update the button state
+    button_state = current_button_state;
+    HAL_UART_Receive(&huart2,receivedData,1,100);
+    if(receivedData[0]=='0'){
+      HAL_GPIO_WritePin(GPIOA,GPIO_PIN_9, GPIO_PIN_SET);
+      HAL_GPIO_WritePin(GPIOA,GPIO_PIN_7,GPIO_PIN_SET);
+      HAL_GPIO_WritePin(GPIOA, GPIO_PIN_8,GPIO_PIN_SET);
+      HAL_GPIO_WritePin(GPIOA, GPIO_PIN_6,GPIO_PIN_SET);
+    }
+    else if (receivedData[1]=='1'){
+      HAL_GPIO_WritePin(GPIOA,GPIO_PIN_9,GPIO_PIN_RESET);
+      HAL_GPIO_WritePin(GPIOA,GPIO_PIN_7,GPIO_PIN_RESET);
+      HAL_GPIO_WritePin(GPIOA, GPIO_PIN_8,GPIO_PIN_RESET);
+      HAL_GPIO_WritePin(GPIOA, GPIO_PIN_6,GPIO_PIN_RESET);
+    }
 
     /* USER CODE END WHILE */
 
     /* USER CODE BEGIN 3 */
   }
+
   /* USER CODE END 3 */
 }
 
@@ -239,11 +231,26 @@ static void MX_GPIO_Init(void)
   /*Configure GPIO pin Output Level */
   HAL_GPIO_WritePin(GPIOB, GPIO_PIN_9, GPIO_PIN_RESET);
 
-  /*Configure GPIO pin : B1_Pin */
-  GPIO_InitStruct.Pin = B1_Pin;
-  GPIO_InitStruct.Mode = GPIO_MODE_IT_FALLING;
+  /*Configure GPIO pin : USART_TX_Pin */
+  GPIO_InitStruct.Pin = USART_TX_Pin;
+  GPIO_InitStruct.Mode = GPIO_MODE_AF_PP;
   GPIO_InitStruct.Pull = GPIO_NOPULL;
-  HAL_GPIO_Init(B1_GPIO_Port, &GPIO_InitStruct);
+  GPIO_InitStruct.Speed = GPIO_SPEED_FREQ_LOW;
+  GPIO_InitStruct.Alternate = GPIO_AF7_USART2;
+  HAL_GPIO_Init(USART_TX_GPIO_Port, &GPIO_InitStruct);
+
+  /*Configure GPIO pin : PA5 */
+  GPIO_InitStruct.Pin = GPIO_PIN_5;
+  GPIO_InitStruct.Mode = GPIO_MODE_OUTPUT_PP;
+  GPIO_InitStruct.Pull = GPIO_NOPULL;
+  GPIO_InitStruct.Speed = GPIO_SPEED_FREQ_LOW;
+  HAL_GPIO_Init(GPIOA, &GPIO_InitStruct);
+
+  /*Configure GPIO pin : PA7 */
+  GPIO_InitStruct.Pin = GPIO_PIN_7;
+  GPIO_InitStruct.Mode = GPIO_MODE_INPUT;
+  GPIO_InitStruct.Pull = GPIO_PULLDOWN;
+  HAL_GPIO_Init(GPIOA, &GPIO_InitStruct);
 
   /*Configure GPIO pins : LD2_Pin PA7 PA8 PA9 */
   GPIO_InitStruct.Pin = LD2_Pin|GPIO_PIN_7|GPIO_PIN_8|GPIO_PIN_9;
@@ -252,8 +259,8 @@ static void MX_GPIO_Init(void)
   GPIO_InitStruct.Speed = GPIO_SPEED_FREQ_LOW;
   HAL_GPIO_Init(GPIOA, &GPIO_InitStruct);
 
-  /*Configure GPIO pins : PB6 PB8 */
-  GPIO_InitStruct.Pin = GPIO_PIN_6|GPIO_PIN_8;
+  /*Configure GPIO pin : PB6 */
+  GPIO_InitStruct.Pin = GPIO_PIN_6;
   GPIO_InitStruct.Mode = GPIO_MODE_INPUT;
   GPIO_InitStruct.Pull = GPIO_PULLDOWN;
   HAL_GPIO_Init(GPIOB, &GPIO_InitStruct);
