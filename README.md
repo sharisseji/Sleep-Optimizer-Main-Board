@@ -5,3 +5,5 @@ This project uses two STM32 Microcontrollers to manually control and reset light
 Code for the secondary board can be found [here](https://github.com/sharisseji/Sleep-Optimizer-Board-A.git).
 
 The board type we used was the STM32 NUCLEO F401RE for both microctontrollers. The microcontrollers were programmed using STM32CubeIDE.
+
+Functional code can be found in ECE198 -> Core -> Src -> main.c
